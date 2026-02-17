@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Slide Pro</title>
+    <title>Neon Slide Pro + Highscore</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; touch-action: none; }
         canvas { display: block; }
         #ui { 
             position: absolute; top: 15px; left: 15px; color: white; 
-            font-size: 16px; font-weight: bold; pointer-events: none; z-index: 10;
+            font-size: 14px; font-weight: bold; pointer-events: none; z-index: 10; line-height: 1.4;
         }
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -25,13 +25,13 @@
 </head>
 <body>
     <div id="ui">
-        LEVEL: <span id="lvl">1</span> | SCORE: <span id="scr">0</span><br>
+        LEVEL: <span id="lvl">1</span> | SCORE: <span id="scr">0</span> | BEST: <span id="hscr">0</span><br>
         LIVES: <span id="hrt">❤️❤️❤️</span>
     </div>
     
     <div id="menu" class="overlay">
-        <h1 style="color:#00d2ff; text-shadow: 0 0 10px #00d2ff;">NEON SLIDE PRO</h1>
-        <p>Slide to move • Avoid Red • Get Gold</p>
+        <h1 id="title" style="color:#00d2ff; text-shadow: 0 0 10px #00d2ff; margin-bottom: 5px;">NEON SLIDE PRO</h1>
+        <p id="info">Slide up/down • Avoid Red • Get Gold</p>
         <button onclick="start()">START GAME</button>
     </div>
 
@@ -40,10 +40,12 @@
 <script>
 const canvas = document.getElementById("c"), ctx = canvas.getContext("2d");
 let l=1, s=0, lives=3, active=false, lastY=0;
+let highscore = localStorage.getItem("neonSlideHighscore") || 0;
+
 const colors = ["#00d2ff","#00ff88","#ffff00","#ff00ff","#ff4b2b","#ffffff","#7000ff","#00ffcc","#ff8800","#ff0000",
                 "#00d2ff","#00ff88","#ffff00","#ff00ff","#ff4b2b","#ffffff","#7000ff","#00ffcc","#ff8800","#ff0000"];
 
-const player = { x: 50, y: 0, s: 20 }; // Kleinere blokjes (20px)
+const player = { x: 50, y: 0, s: 20 };
 let enemies = [], coins = [];
 
 function resize() {
@@ -53,7 +55,9 @@ function resize() {
 }
 window.onresize = resize; resize();
 
-// RELATIEVE BESTURING: Blokje verschuift alleen bij beweging
+// Toon opgeslagen highscore bij laden
+document.getElementById("hscr").innerText = highscore;
+
 window.addEventListener('touchstart', e => { lastY = e.touches[0].clientY; });
 window.addEventListener('touchmove', e => {
     if(!active) return;
@@ -61,7 +65,6 @@ window.addEventListener('touchmove', e => {
     let deltaY = e.touches[0].clientY - lastY;
     player.y += deltaY;
     lastY = e.touches[0].clientY;
-    
     if (player.y < 0) player.y = 0;
     if (player.y > canvas.height - player.s) player.y = canvas.height - player.s;
 }, {passive: false});
@@ -79,7 +82,7 @@ function spawnEnemy() {
 }
 
 function spawnCoin() {
-    if(Math.random() < 0.01) // Kans op gouden ring
+    if(Math.random() < 0.008) 
         coins.push({ x: canvas.width, y: Math.random()*(canvas.height-20), s: 15 });
 }
 
@@ -87,17 +90,25 @@ function updateUI() {
     document.getElementById("lvl").innerText = l;
     document.getElementById("scr").innerText = s;
     document.getElementById("hrt").innerText = "❤️".repeat(lives);
+    document.getElementById("hscr").innerText = highscore;
+}
+
+function checkHighscore() {
+    if (s > highscore) {
+        highscore = s;
+        localStorage.setItem("neonSlideHighscore", highscore);
+        return true;
+    }
+    return false;
 }
 
 function loop() {
     if(!active) return;
     ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    // Speler (Neon)
     ctx.shadowBlur = 15; ctx.shadowColor = colors[l-1]; ctx.fillStyle = colors[l-1];
     ctx.fillRect(player.x, player.y, player.s, player.s);
 
-    // Vijanden (Neon Red)
     ctx.shadowColor = "#ff2d55"; ctx.fillStyle = "#ff2d55";
     enemies.forEach((en, i) => {
         en.x -= en.v;
@@ -109,15 +120,19 @@ function loop() {
             if(s % 20 === 0 && l < 20) l++; 
         }
 
-        // Collision
         if(player.x < en.x+en.s && player.x+player.s > en.x && player.y < en.y+en.s && player.y+player.s > en.y) {
             lives--; updateUI();
-            en.x = -100; // Verwijder vijand tijdelijk
-            if(lives <= 0) { active = false; document.getElementById("menu").style.display="flex"; }
+            en.x = -200; 
+            if(lives <= 0) { 
+                active = false; 
+                const newRecord = checkHighscore();
+                document.getElementById("title").innerText = newRecord ? "NEW RECORD!" : "GAME OVER";
+                document.getElementById("info").innerText = "Final Score: " + s;
+                document.getElementById("menu").style.display="flex"; 
+            }
         }
     });
 
-    // Gouden Ringen
     spawnCoin();
     ctx.shadowColor = "#ffd700"; ctx.fillStyle = "#ffd700";
     coins.forEach((c, i) => {
