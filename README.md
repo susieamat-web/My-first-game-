@@ -1,46 +1,28 @@
-# 🎮 My first game - Slide Survival: 10 Levels
+# 🎮 Neon Slide Survival
 
-Een spannend schuif-spel waar je moet ontwijken voor vijanden! Hoe lang kun jij het volhouden?
+Welkom bij mijn eerste mobiele game! Dit is een simpel, maar verslavend spel waarbij je een neon blokje bestuurt om obstakels te ontwijken.
 
-## 🎯 Hoe te spelen
+## 🚀 Hoe speel ik het?
 
-- **Beweeg je vinger/muis** omhoog en omlaag om je blokje te besturen
-- **Ontwijik de rode blokken** (vijanden) die van rechts naar links komen
-- Elk vijand die voorbij gaat = **1 punt**!
-- Na elke **15 punten** word je level hoger
-- De vijanden worden **sneller en talrijker** naarmate je level omhoog gaat
-- **10 levels** om te doorstaan - kun je ze allemaal halen?
+Je kunt het spel direct in je browser spelen via GitHub Pages:
+👉 **[KLIK HIER OM TE SPELEN](https://susieamat-web.github.io/My-first-game-/)**
 
-## 📱 Controls
+### Besturing (Mobiel & Desktop):
+* **Sleep of beweeg** je vinger/muis omhoog en omlaag over het scherm.
+* Het blauwe blokje volgt je beweging direct.
+* **Doel:** Ontwijk de rode blokken en haal een zo hoog mogelijke score!
 
-| Platform | Besturing |
-|----------|-----------|
-| **Mobiel** | Beweeg je vinger op het scherm omhoog/omlaag |
-| **PC** | Beweeg je muis omhoog/omlaag |
+## 📈 Levels
+Het spel heeft **10 levels**. Hoe hoger je score, hoe lastiger het wordt:
+- De vijanden gaan steeds sneller bewegen.
+- De kleur van je speler verandert per level.
+- Bij **Level 10** en een score van **150** heb je het spel officieel uitgespeeld!
 
-## 🌈 Features
-
-- ✨ **10 unieke levels** met verschillende kleuren
-- 🎨 **Glow-effect** dat verandert per level
-- 📊 **Score-systeem** om je voortgang te zien
-- 📱 **Volledig responsief** - werkt op alle apparaten
-- ⚡ **Smooth gameplay** met progressieve moeilijkheidsgraad
-
-## 🚀 Start nu!
-
-Speel het spel hier: [Slide Survival](https://susieamat-web.github.io/My-first-game/)
-
-## 📋 Systeemvereisten
-
-- Moderne webbrowser (Chrome, Firefox, Safari, Edge)
-- JavaScript ingeschakeld
-
-## 💡 Tips
-
-- Blijf in het midden van het scherm voor meer reactietijd
-- Let op de snelheid die toeneemt per level
-- Probeer alle 10 levels uit te spelen zonder te crashen!
+## 🛠️ Gebruikte Technieken
+Dit spel is volledig gebouwd met:
+* **HTML5 Canvas** voor de graphics.
+* **CSS3** voor de styling en neon effecten.
+* **JavaScript** voor de game engine en collision detectie.
 
 ---
-
-**Gemaakt met ❤️ in HTML5 Canvas**
+*Gemaakt door [susieamat-web](https://github.com/susieamat-web)*
