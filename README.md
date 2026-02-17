@@ -1,5 +1,7 @@
 # 🎮 Neon Slide Survival
 
+![Neon Slide](neon-slide.png)
+
 ![Neon Slide Logo](logo.png)
 
 Welcome to my first mobile web game! **Neon Slide Survival** is a fast-paced, arcade-style game built for mobile browsers. Test your reflexes as you navigate a neon world filled with obstacles.
