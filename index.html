@@ -1,94 +1,136 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GitHub Mobile Game</title>
+    <title>Neon Slide Pro</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; touch-action: none; }
-        canvas { display: block; background: linear-gradient(to bottom, #111, #222); }
-        #ui { position: absolute; top: 10px; left: 10px; color: #00d2ff; font-weight: bold; font-size: 20px; pointer-events: none; }
-        #menu { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.8); z-index: 10;
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; touch-action: none; }
+        canvas { display: block; }
+        #ui { 
+            position: absolute; top: 15px; left: 15px; color: white; 
+            font-size: 16px; font-weight: bold; pointer-events: none; z-index: 10;
         }
-        button { 
-            padding: 20px 50px; font-size: 24px; background: #00d2ff; color: #000; 
-            border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 0 20px #00d2ff;
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.85); color: white; text-align: center; z-index: 20;
+        }
+        button {
+            padding: 15px 40px; font-size: 20px; cursor: pointer; border: none;
+            background: #00d2ff; color: black; font-weight: bold; border-radius: 50px;
+            box-shadow: 0 0 20px #00d2ff; margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div id="ui">Level: <span id="l">1</span> | Score: <span id="s">0</span></div>
-    <div id="menu">
-        <h1 style="color:white; margin-bottom:30px;">SLIDE SURVIVAL</h1>
-        <button onclick="start()">START</button>
+    <div id="ui">
+        LEVEL: <span id="lvl">1</span> | SCORE: <span id="scr">0</span><br>
+        LIVES: <span id="hrt">❤️❤️❤️</span>
     </div>
+    
+    <div id="menu" class="overlay">
+        <h1 style="color:#00d2ff; text-shadow: 0 0 10px #00d2ff;">NEON SLIDE PRO</h1>
+        <p>Slide to move • Avoid Red • Get Gold</p>
+        <button onclick="start()">START GAME</button>
+    </div>
+
     <canvas id="c"></canvas>
 
 <script>
-    const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
-    let l=1, s=0, active=false, player={x:50, y:200, size:30}, enemies=[];
+const canvas = document.getElementById("c"), ctx = canvas.getContext("2d");
+let l=1, s=0, lives=3, active=false, lastY=0;
+const colors = ["#00d2ff","#00ff88","#ffff00","#ff00ff","#ff4b2b","#ffffff","#7000ff","#00ffcc","#ff8800","#ff0000",
+                "#00d2ff","#00ff88","#ffff00","#ff00ff","#ff4b2b","#ffffff","#7000ff","#00ffcc","#ff8800","#ff0000"];
 
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.onresize = resize; resize();
+const player = { x: 50, y: 0, s: 20 }; // Kleinere blokjes (20px)
+let enemies = [], coins = [];
 
-    function start() {
-        l=1; s=0; active=true; enemies=[];
-        document.getElementById('menu').style.display='none';
-        for(let i=0; i<5; i++) spawn();
-        loop();
-    }
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    player.y = canvas.height / 2;
+}
+window.onresize = resize; resize();
 
-    function spawn() {
-        enemies.push({
-            x: canvas.width + Math.random()*500,
-            y: Math.random()*(canvas.height-40),
-            size: 35,
-            v: 3 + (l * 1.5)
-        });
-    }
+// RELATIEVE BESTURING: Blokje verschuift alleen bij beweging
+window.addEventListener('touchstart', e => { lastY = e.touches[0].clientY; });
+window.addEventListener('touchmove', e => {
+    if(!active) return;
+    e.preventDefault();
+    let deltaY = e.touches[0].clientY - lastY;
+    player.y += deltaY;
+    lastY = e.touches[0].clientY;
+    
+    if (player.y < 0) player.y = 0;
+    if (player.y > canvas.height - player.s) player.y = canvas.height - player.s;
+}, {passive: false});
 
-    window.ontouchmove = (e) => { 
-        if(active) player.y = e.touches[0].clientY - 15; 
-    };
+function start() {
+    l=1; s=0; lives=3; active=true; enemies=[]; coins=[];
+    document.getElementById("menu").style.display = "none";
+    updateUI();
+    for(let i=0; i<4; i++) spawnEnemy();
+    loop();
+}
 
-    function loop() {
-        if(!active) return;
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+function spawnEnemy() {
+    enemies.push({ x: canvas.width + Math.random()*400, y: Math.random()*(canvas.height-25), s: 25, v: 3 + (l * 0.7) });
+}
+
+function spawnCoin() {
+    if(Math.random() < 0.01) // Kans op gouden ring
+        coins.push({ x: canvas.width, y: Math.random()*(canvas.height-20), s: 15 });
+}
+
+function updateUI() {
+    document.getElementById("lvl").innerText = l;
+    document.getElementById("scr").innerText = s;
+    document.getElementById("hrt").innerText = "❤️".repeat(lives);
+}
+
+function loop() {
+    if(!active) return;
+    ctx.fillStyle = "#050505"; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // Speler (Neon)
+    ctx.shadowBlur = 15; ctx.shadowColor = colors[l-1]; ctx.fillStyle = colors[l-1];
+    ctx.fillRect(player.x, player.y, player.s, player.s);
+
+    // Vijanden (Neon Red)
+    ctx.shadowColor = "#ff2d55"; ctx.fillStyle = "#ff2d55";
+    enemies.forEach((en, i) => {
+        en.x -= en.v;
+        ctx.fillRect(en.x, en.y, en.s, en.s);
         
-        // Speler
-        ctx.fillStyle='#00d2ff';
-        ctx.shadowBlur=15; ctx.shadowColor='#00d2ff';
-        ctx.fillRect(player.x, player.y, player.size, player.size);
-        ctx.shadowBlur=0;
+        if(en.x < -30) {
+            en.x = canvas.width + 100; en.y = Math.random()*(canvas.height-25);
+            s++; updateUI();
+            if(s % 20 === 0 && l < 20) l++; 
+        }
 
-        // Vijanden
-        ctx.fillStyle='#ff4444';
-        enemies.forEach(en => {
-            en.x -= en.v;
-            ctx.fillRect(en.x, en.y, en.size, en.size);
-            
-            if(en.x < -50) {
-                en.x = canvas.width + 100;
-                en.y = Math.random()*(canvas.height-40);
-                s++;
-                if(s % 10 === 0 && l < 10) l++;
-            }
+        // Collision
+        if(player.x < en.x+en.s && player.x+player.s > en.x && player.y < en.y+en.s && player.y+player.s > en.y) {
+            lives--; updateUI();
+            en.x = -100; // Verwijder vijand tijdelijk
+            if(lives <= 0) { active = false; document.getElementById("menu").style.display="flex"; }
+        }
+    });
 
-            // Collision
-            if(player.x < en.x+en.size && player.x+player.size > en.x &&
-               player.y < en.y+en.size && player.y+player.size > en.y) {
-                active=false;
-                document.getElementById('menu').style.display='flex';
-            }
-        });
-
-        document.getElementById('l').innerText = l;
-        document.getElementById('s').innerText = s;
-        requestAnimationFrame(loop);
-    }
+    // Gouden Ringen
+    spawnCoin();
+    ctx.shadowColor = "#ffd700"; ctx.fillStyle = "#ffd700";
+    coins.forEach((c, i) => {
+        c.x -= 4;
+        ctx.beginPath(); ctx.arc(c.x, c.y, c.s, 0, Math.PI*2); ctx.fill();
+        if(player.x < c.x+c.s && player.x+player.s > c.x-c.s && player.y < c.y+c.s && player.y+player.s > c.y-c.s) {
+            s += 100; updateUI(); coins.splice(i, 1);
+        }
+    });
+    
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(loop);
+}
 </script>
 </body>
 </html>
