@@ -1,34 +1,41 @@
-# 🎮 Neon Slide Survival
+# 🎮 Neon Slide Pro
 
-![Neon Slide](neon-slide.png)
+![Neon Slide Logo](logo.png)
 
-
-Welcome to my first mobile web game! **Neon Slide Survival** is a fast-paced, arcade-style game built for mobile browsers. Test your reflexes as you navigate a neon world filled with obstacles.
+The ultimate neon survival challenge is here! **Neon Slide Pro** is an upgraded, fast-paced arcade game built for mobile. Do you have the skills to survive all 20 levels?
 
 ## 🚀 Play Now
 
-The game is live and ready to play via GitHub Pages:
+Experience the glow on GitHub Pages:
 👉 **[CLICK HERE TO PLAY](https://susieamat-web.github.io/My-first-game-/)**
+
+---
+
+## 💎 New Pro Features
+
+* **❤️ 3 Lives:** You no longer die instantly! You have three hearts to help you reach the end.
+* **✨ Neon Glow:** Beautifully rendered neon blocks with real-time light effects.
+* **🏆 20 Progressive Levels:** The difficulty increases gradually as you climb towards Level 20.
+* **🟡 Golden Rings:** Rare items that grant a massive **+100 points** boost!
+* **📱 Relative Touch Control:** Precise sliding mechanics—the player follows your movement, not your tap location.
 
 ---
 
 ## 🕹️ How to Play
 
-### Controls (Mobile & Desktop)
-* **Touch & Drag:** Slide your finger up and down the screen to move your player.
-* **Mouse:** Move your cursor to control the vertical position of the neon square.
-* **Objective:** Avoid the red obstacles. Every block you pass increases your score!
+### Controls
+* **Mobile:** Place your finger anywhere and **slide up or down**. The block will mirror your movement.
+* **Desktop:** Use your mouse to drag the block vertically.
+* **Objective:** Avoid the **Red Neon Blocks**. Collect the **Golden Rings** to skip through levels faster!
 
-### Game Features
-* **10 Challenging Levels:** The speed increases every 15 points.
-* **Adaptive Visuals:** Your player changes color as you progress through levels.
-* **Win Condition:** Reach Level 10 and a score of 150 to claim victory!
-
-## 🛠️ Tech Stack
-This project was built using pure web technologies:
-* **HTML5 Canvas** for real-time rendering.
-* **CSS3** for the neon aesthetic and layout.
-* **JavaScript** for the game logic, movement physics, and collision detection.
+### Winning
+The game intensifies every 20 points. Survive the onslaught and master the speed to reach the final level.
 
 ---
+
+## 🛠️ Technical Details
+* **Relative Movement Logic:** Uses Y-axis delta calculation for a professional feel.
+* **Canvas API:** High-performance rendering for 60FPS gameplay.
+* **Local UI State:** Real-time updates for score, level, and health.
+
 *Created by [susieamat-web](https://github.com/susieamat-web)*
