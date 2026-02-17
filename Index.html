@@ -1,1 +1,165 @@
-<!DOCTYPE html> <html lang="nl"> <head>     <meta charset="UTF-8">     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">     <title>Slide Survival: 10 Levels</title>     <style>         body { margin: 0; overflow: hidden; background: #111; font-family: sans-serif; touch-action: none; }         canvas { display: block; }         #ui {              position: absolute; top: env(safe-area-inset-top, 20px); left: 20px;              color: white; font-size: 20px; font-weight: bold; pointer-events: none;          }         #msg {             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);             color: white; text-align: center; display: none; background: rgba(0,0,0,0.9);             padding: 30px; border-radius: 15px; border: 3px solid #00d2ff;         }     </style> </head> <body>     <div id="ui">LEVEL: <span id="lvl">1</span> | SCORE: <span id="scr">0</span></div>     <div id="msg" onclick="resetGame()"><h1>CRASH!</h1><p>Tik om het opnieuw te proberen</p></div>     <canvas id="gameCanvas"></canvas>  <script> const canvas = document.getElementById("gameCanvas"); const ctx = canvas.getContext("2d"); const lvlDisp = document.getElementById("lvl"); const scrDisp = document.getElementById("scr"); const msg = document.getElementById("msg");  let level = 1; let score = 0; let active = true; // Kleuren die per level veranderen const levelColors = ["#00d2ff", "#00ff88", "#ffee00", "#ff00ee", "#ff3300", "#ffffff", "#8800ff", "#00ccff", "#ff8800", "#ff0000"];  const player = { x: 50, y: 300, size: 35 }; let enemies = [];  // Functie om vijanden aan te maken (wordt moeilijker per level) function initLevel() {     enemies = [];     let enemyCount = 3 + level;      for(let i = 0; i < enemyCount; i++) {         enemies.push({             x: canvas.width + (i * (canvas.width / 2)),             y: Math.random() * (canvas.height - 40),             w: 40,             h: 40,             speed: 4 + (level * 1.2)         });     } }  function resize() {     canvas.width = window.innerWidth;     canvas.height = window.innerHeight;     initLevel(); } window.addEventListener('resize', resize); resize();  // --- DE SCHUIF BESTURING --- function handleMove(e) {     if(!active) return;     let clientY = e.touches ? e.touches[0].clientY : e.clientY;     // Het poppetje volgt je vinger op de Y-as     player.y = clientY - (player.size / 2);          // Zorg dat hij niet buiten het scherm schuift     if(player.y < 0) player.y = 0;     if(player.y > canvas.height - player.size) player.y = canvas.height - player.size; }  window.addEventListener('touchmove', (e) => { e.preventDefault(); handleMove(e); }, {passive: false}); window.addEventListener('mousemove', handleMove);  function update() {     if (!active) return;      enemies.forEach(en => {         en.x -= en.speed;          // Als vijand links het scherm verlaat, komt hij rechts weer terug         if (en.x + en.w < 0) {             en.x = canvas.width + Math.random() * 200;             en.y = Math.random() * (canvas.height - en.h);             score++;             scrDisp.innerText = score;         }          // Botsing detectie         if (player.x < en.x + en.w && player.x + player.size > en.x &&             player.y < en.y + en.h && player.y + player.size > en.y) {             gameOver();         }     });      // Level omhoog elke 15 punten     if (score >= level * 15 && level < 10) {         level++;         lvlDisp.innerText = level;         initLevel(); // Vijanden worden sneller     }          // Win conditie     if (level === 10 && score > 200) {         alert("GEWONNEN! Je bent een pro!");         resetGame();     } }  function draw() {     // Achtergrond     ctx.fillStyle = "#111";     ctx.fillRect(0, 0, canvas.width, canvas.height);      // Teken Speler (het schuif-blokje)     ctx.fillStyle = levelColors[level-1];     ctx.shadowBlur = 15;     ctx.shadowColor = levelColors[level-1];     ctx.fillRect(player.x, player.y, player.size, player.size);     ctx.shadowBlur = 0; // Reset schaduw voor andere objecten      // Teken Vijanden (rode blokken)     ctx.fillStyle = "#ff4444";     enemies.forEach(en => {         ctx.fillRect(en.x, en.y, en.w, en.h);     });      update();     requestAnimationFrame(draw); }  function gameOver() {     active = false;     msg.style.display = "block"; }  function resetGame() {     level = 1;     score = 0;     active = true;     msg.style.display = "none";     lvlDisp.innerText = level;     scrDisp.innerText = score;     initLevel(); }  draw(); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neon Slide Survival</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', Arial, sans-serif; touch-action: none; }
+        canvas { display: block; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; color: white; 
+            font-size: 18px; font-weight: bold; pointer-events: none; z-index: 10;
+            text-shadow: 0 0 5px rgba(0,0,0,1);
+        }
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.85); color: white; text-align: center; z-index: 20;
+        }
+        button {
+            padding: 15px 40px; font-size: 20px; cursor: pointer; border: none;
+            background: #00d2ff; color: black; font-weight: bold; border-radius: 50px;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.5); margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui">LEVEL: <span id="lvl">1</span> | SCORE: <span id="scr">0</span></div>
+    
+    <div id="startScreen" class="overlay">
+        <h1>NEON SLIDE</h1>
+        <p>Sleep je blokje omhoog en omlaag om te overleven.</p>
+        <button onclick="startGame()">START SPEL</button>
+    </div>
+
+    <div id="gameOverScreen" class="overlay" style="display: none;">
+        <h1 id="statusTitle">GAME OVER</h1>
+        <p id="finalScore"></p>
+        <button onclick="startGame()">PROBEER OPNIEUW</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const lvlDisp = document.getElementById("lvl");
+const scrDisp = document.getElementById("scr");
+
+// Game States
+let level = 1;
+let score = 0;
+let isRunning = false;
+const colors = ["#00d2ff", "#3aef3a", "#ffff00", "#ff00ff", "#ff4b2b", "#ffffff", "#7000ff", "#00ffcc", "#ff8800", "#ff0000"];
+
+const player = { x: 50, y: 0, size: 30, color: colors[0] };
+let enemies = [];
+
+function initLevel() {
+    enemies = [];
+    let count = 3 + Math.floor(level * 0.8);
+    for(let i = 0; i < count; i++) {
+        enemies.push({
+            x: canvas.width + (i * (canvas.width / 2.5)),
+            y: Math.random() * (canvas.height - 40),
+            w: 35,
+            h: 35,
+            speed: 5 + (level * 1.5)
+        });
+    }
+}
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    player.y = canvas.height / 2;
+    if(isRunning) initLevel();
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Input handling
+function move(e) {
+    if(!isRunning) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    player.y = clientY - (player.size / 2);
+    // Boundary check
+    if (player.y < 0) player.y = 0;
+    if (player.y > canvas.height - player.size) player.y = canvas.height - player.size;
+}
+
+window.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); }, {passive: false});
+window.addEventListener('mousemove', move);
+
+function startGame() {
+    level = 1;
+    score = 0;
+    isRunning = true;
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("gameOverScreen").style.display = "none";
+    lvlDisp.innerText = level;
+    scrDisp.innerText = score;
+    initLevel();
+    requestAnimationFrame(gameLoop);
+}
+
+function gameOver(won = false) {
+    isRunning = false;
+    const screen = document.getElementById("gameOverScreen");
+    const title = document.getElementById("statusTitle");
+    screen.style.display = "flex";
+    title.innerText = won ? "GEWONNEN!" : "CRASH!";
+    title.style.color = won ? "#3aef3a" : "#ff4b2b";
+    document.getElementById("finalScore").innerText = "Behaald Level: " + level + " | Score: " + score;
+}
+
+function update() {
+    if (!isRunning) return;
+
+    enemies.forEach(en => {
+        en.x -= en.speed;
+
+        if (en.x + en.w < 0) {
+            en.x = canvas.width + Math.random() * 300;
+            en.y = Math.random() * (canvas.height - en.h);
+            score++;
+            scrDisp.innerText = score;
+
+            // Level up logic
+            if (score > 0 && score % 15 === 0 && level < 10) {
+                level++;
+                lvlDisp.innerText = level;
+                en.speed += 1.5; // Directe speed boost
+            }
+        }
+
+        // Win condition
+        if (level === 10 && score >= 150) {
+            gameOver(true);
+        }
+
+        // Collision check (Hitbox iets kleiner maken voor eerlijkheid)
+        const p = { x: player.x + 5, y: player.y + 5, s: player.size - 10 };
+        if (p.x < en.x + en.w && p.x + p.s > en.x &&
+            p.y < en.y + en.h && p.y + p.s > en.y) {
+            gameOver(false);
+        }
+    });
+}
+
+function draw() {
+    ctx.fillStyle = "#050505";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Grid effect achtergrond
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 1;
+    for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+    for(let i=0; i<canvas.height; i+=50) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
+
+    // Speler
+    ctx.fillStyle = colors[level-1];
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = colors[level-1];
+    ctx.fillRect(player.x, player.y,
